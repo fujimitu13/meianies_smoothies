@@ -53,3 +53,7 @@ if ingredients_list:
             # エラーが発生した場合の処理
             st.error(f'Error: {e}', icon="❌")
             st.write("SQL Statement:", my_insert_stmt)
+
+import requests
+fruityvice_response = requests.get("https://fruityvice.com/api/fruit/watermelon")
+st.text(fruityvice_response)
