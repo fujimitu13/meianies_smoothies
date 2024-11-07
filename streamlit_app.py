@@ -2,18 +2,16 @@
 import streamlit as st
 from snowflake.snowpark import Session
 from snowflake.snowpark.functions import col
-import requests
-import os
 
 # Snowflake接続情報を辞書として指定
 connection_parameters = {
-    "account": os.getenv("SNOWFLAKE_ACCOUNT"),  # 環境変数から取得
-    "user": os.getenv("SNOWFLAKE_USER"),
-    "password": os.getenv("SNOWFLAKE_PASSWORD"),
-    "role": os.getenv("SNOWFLAKE_ROLE"),  # optional
-    "warehouse": os.getenv("SNOWFLAKE_WAREHOUSE"),
-    "database": os.getenv("SNOWFLAKE_DATABASE"),
-    "schema": os.getenv("SNOWFLAKE_SCHEMA")
+    "account": "ELNQWKZ-MY89942",  # 例: "your_account"
+    "user": "Fujii_Kotaro",        # あなたのユーザー名
+    "password": "Fujimitu13", # あなたのパスワード
+    "role": "SYSADMIN",        # optional, 役割
+    "warehouse": "COMPUTE_WH", # 使用するウェアハウス
+    "database": "SMOOTHIES", # 使用するデータベース
+    "schema": "PUBLIC"     # 使用するスキーマ
 }
 
 # Snowflakeセッションの作成
@@ -56,17 +54,6 @@ if ingredients_list:
             st.error(f'Error: {e}', icon="❌")
             st.write("SQL Statement:", my_insert_stmt)
 
-# Fruityvice APIからデータを取得
-try:
-    fruityvice_response = requests.get("https://fruityvice.com/api/fruit/watermelon")
-    fruityvice_response.raise_for_status()  # HTTPエラーをチェック
-    fruit_data = fruityvice_response.json()  # JSONデータをデコード
-
-    # データを表示
-    st.write("Fruityvice API Response:")
-    st.json(fruit_data)  # JSON形式で表示
-
-except requests.exceptions.RequestException as e:
-    st.error(f"Request failed: {e}")  # リクエストエラーの処理
-except ValueError as e:
-    st.error(f"Failed to decode JSON: {e}")  # JSONデコードエラーの処理
+import requests
+fruityvice_response = requests.get("https://fruityvice.com/api/fruit/watermelon")
+st.text(fruityvice_response)
