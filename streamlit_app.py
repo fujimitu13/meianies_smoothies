@@ -2,6 +2,7 @@
 import streamlit as st
 from snowflake.snowpark import Session
 from snowflake.snowpark.functions import col
+import requests
 
 # Snowflake接続情報を辞書として指定
 connection_parameters = {
@@ -54,6 +55,17 @@ if ingredients_list:
             st.error(f'Error: {e}', icon="❌")
             st.write("SQL Statement:", my_insert_stmt)
 
-import requests
-fruityvice_response = requests.get("https://fruityvice.com/api/fruit/watermelon")
-st.text(fruityvice_response)
+# Fruityvice APIからデータを取得
+try:
+    fruityvice_response = requests.get("https://fruityvice.com/api/fruit/watermelon")
+    fruityvice_response.raise_for_status()  # HTTPエラーをチェック
+    fruit_data = fruityvice_response.json()  # JSONデータをデコード
+
+    # データを表示
+    st.write("Fruityvice API Response:")
+    st.json(fruit_data)  # JSON形式で表示
+
+except requests.exceptions.RequestException as e:
+    st.error(f"Request failed: {e}")  # リクエストエラーの処理
+except ValueError as e:
+    st.error(f"Failed to decode JSON: {e}")  # JSONデコードエラーの処理
