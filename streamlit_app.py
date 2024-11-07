@@ -3,6 +3,17 @@ import streamlit as st
 from snowflake.snowpark import Session
 from snowflake.snowpark.functions import col
 
+# Snowflake接続情報を辞書として指定
+connection_parameters = {
+    "account": "ELNQWKZ-MY89942",  # 例: "your_account"
+    "user": "Fujii_Kotaro",        # あなたのユーザー名
+    "password": "Fujimitu13", # あなたのパスワード
+    "role": "SYSADMIN",        # optional, 役割
+    "warehouse": "COMPUTE_WH", # 使用するウェアハウス
+    "database": "SMOOTHIES", # 使用するデータベース
+    "schema": "PUBLIC"     # 使用するスキーマ
+}
+
 # Snowflakeセッションの作成
 session = Session.builder.configs(connection_parameters).create()
 
@@ -14,7 +25,7 @@ st.write("Choose the fruits you want in your custom Smoothie!")
 name_on_order = st.text_input("Name on Smoothie")
 st.write("The name on your Smoothie will be:", name_on_order)
 
-# Snowflakeセッションの取得
+# Snowflakeセッションからデータを取得
 my_dataframe = session.table("smoothies.public.fruit_options").select(col('FRUIT_NAME'))
 
 # ユーザーに果物の選択を促す
