@@ -1,42 +1,50 @@
 # Import python packages
 import streamlit as st
 from snowflake.snowpark.context import get_active_session
-from snowflake.snowpark.functions import col, when_matched 
+from snowflake.snowpark.functions import col
 
 # Write directly to the app
 st.title(":cup_with_straw: Customize Your Smoothie! :cup_with_straw:")
-st.write("Choose the fruits you want in your custom Smoothie!")
+st.write(
+    """
+    Choosse the fruits you want in your custom Smoothie!
+    """
+)
 
-# ユーザーからの入力を受け取る
 name_on_order = st.text_input("Name on Smoothie")
 st.write("The name on your Smoothie will be:", name_on_order)
 
-# Snowflakeセッションの取得
 session = get_active_session()
 my_dataframe = session.table("smoothies.public.fruit_options").select(col('FRUIT_NAME'))
+# st.dataframe(data=my_dataframe, use_container_width=True)
 
-# ユーザーに果物の選択を促す
 ingredients_list = st.multiselect(
     'Choose up to 5 ingredients:'
-    ,my_dataframe.to_pandas()['FRUIT_NAME'].tolist()  # Snowpark DataFrameをPandas DataFrameに変換してリストを取得
-    ,max_selections=5
+    , my_dataframe
+    
 )
 
 if ingredients_list:
-    ingredients_string = ' '.join(ingredients_list)  # 選択した果物をカンマ区切りの文字列にする
+  # st.write(ingredients_list)
+  # st.text(ingredients_list)
 
-    # SQL文をパラメータ化
-    my_insert_stmt = "INSERT INTO smoothies.public.orders (ingredients, name_on_order) VALUES (:1, :2)"  # 正しい列名を使用
+  ingredients_string = ''
 
-    # 注文を送信するボタン
-    time_to_insert = st.button('Submit Order')
+  for fruit_chosen in ingredients_list:
+      ingredients_string += fruit_chosen + ' '
 
-    if time_to_insert:
-        try:
-            # SQLを実行
-            session.sql(my_insert_stmt, [ingredients_string, name_on_order]).collect()
-            st.success(f'Your Smoothie is ordered, {name_on_order}!', icon="✅")
-        except Exception as e:
-            # エラーが発生した場合の処理
-            st.error(f'Error: {e}', icon="❌")
-            st.write("SQL Statement:", my_insert_stmt)
+  # st.write(ingredients_string)
+
+  my_insert_stmt = """ insert into smoothies.public.orders(ingredients, name_on_order)
+            values ('""" + ingredients_string + """','""" + name_on_order + """')"""
+
+  st.write(my_insert_stmt)
+  st.stop
+
+  # st.write(my_insert_stmt)
+  time_to_insert = st.button('Submit Order') 
+    
+  if time_to_insert:
+      session.sql(my_insert_stmt).collect()
+      st.success('Your Smoothie is ordered!', icon="✅")
+      
