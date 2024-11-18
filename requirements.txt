@@ -3,3 +3,4 @@ snowflake-snowpark-python
 streamlit
 requests
 matplotlib
+sqlalchemy
