@@ -5,3 +5,6 @@ requests
 matplotlib
 sqlalchemy
 snowflake-sqlalchemy
+plaintext
+pandas
+snowflake-connector-python
